@@ -212,31 +212,28 @@ function Chat({ onBack, apiPath, title, updateStats }) {
     setLoading(true)
 
     try {
-      // Simulate API call with mock response
-      await new Promise((resolve) => setTimeout(resolve, 1000 + Math.random() * 2000))
-
-      const mockResponses = [
-        "Based on your question, here's a detailed explanation: The concept you're asking about involves several key principles that work together to form a comprehensive understanding.",
-        "Let me break this down step by step: First, we need to understand the fundamental concepts, then we can explore how they apply to your specific question.",
-        "This is an excellent question! The answer involves multiple layers of understanding that build upon each other to create a complete picture.",
-        "I can help clarify this topic for you. The key points to remember are interconnected and form the foundation for deeper learning in this subject.",
-      ]
-
-      const reply = mockResponses[Math.floor(Math.random() * mockResponses.length)]
-      setMessages((m) => [...m, { sender: "bot", text: reply, ts: Date.now() }])
-
-      // Update stats
-      updateStats((prevStats) => ({
-        ...prevStats,
-        usage: (prevStats.usage || 0) + 1,
-        doubts: apiPath === "/api/ask" ? (prevStats.doubts || 0) + 1 : prevStats.doubts,
-      }))
-    } catch (e) {
-      setMessages((m) => [...m, { sender: "bot", text: "Error contacting server", ts: Date.now() }])
-    } finally {
-      setLoading(false)
-    }
-  }
+            const res = await fetch(apiPath, {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json','Authorization': `Bearer ${token}`},
+              body: JSON.stringify(apiPath.includes('explain') ? {notesText: text} : {question: text})
+            });
+            const data = await res.json();
+            const reply = data.answer || data.explanation || 'No response';
+            setMessages(m => [...m, {sender: 'bot', text: reply, ts: Date.now()}]);
+            
+            // Update stats
+            const s = JSON.parse(localStorage.getItem('student.stats') || '{}');
+            s.usage = (s.usage || 0) + 1;
+            if (apiPath === '/api/ask') {
+              s.doubts = (s.doubts || 0) + 1;
+            }
+            localStorage.setItem('student.stats', JSON.stringify(s));
+          } catch (e) {
+            setMessages(m => [...m, {sender: 'bot', text: 'Error contacting server', ts: Date.now()}]);
+          } finally {
+            setLoading(false);
+          }
+        };
 
   return (
     <div style={{ paddingTop: "2rem", paddingBottom: "2rem" }}>
