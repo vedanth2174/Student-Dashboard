@@ -215,7 +215,7 @@ function Chat({ onBack, apiPath, title, updateStats }) {
             const res = await fetch("https://student-dashboard-f21z.onrender.com/api/ask", {
               method: 'POST',
               headers: {'Content-Type': 'application/json','Authorization': `Bearer ${token}`},
-              body: JSON.stringify(apiPath.includes('explain') ? {notesText: text} : {question: text})
+              body: JSON.stringify({messages: text});
             });
             const data = await res.json();
             const reply = data.answer || data.explanation || 'No response';
