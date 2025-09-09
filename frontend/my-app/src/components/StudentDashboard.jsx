@@ -212,28 +212,36 @@ function Chat({ onBack, apiPath, title, updateStats }) {
     setLoading(true)
 
     try {
-            const res = await fetch("https://student-dashboard-f21z.onrender.com/api/ask", {
-              method: 'POST',
-              headers: {'Content-Type': 'application/json','Authorization': `Bearer ${token}`},
-              body: JSON.stringify({messages: text});
-            });
-            const data = await res.json();
-            const reply = data.answer || data.explanation || 'No response';
-            setMessages(m => [...m, {sender: 'bot', text: reply, ts: Date.now()}]);
-            
-            // Update stats
-            const s = JSON.parse(localStorage.getItem('student.stats') || '{}');
-            s.usage = (s.usage || 0) + 1;
-            if (apiPath === '/api/ask') {
-              s.doubts = (s.doubts || 0) + 1;
-            }
-            localStorage.setItem('student.stats', JSON.stringify(s));
-          } catch (e) {
-            setMessages(m => [...m, {sender: 'bot', text: 'Error contacting server', ts: Date.now()}]);
-          } finally {
-            setLoading(false);
-          }
-        };
+      const token = localStorage.getItem("token") // token stored after login
+
+      const res = await fetch("https://student-dashboard-f21z.onrender.com/api/ask", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ question: text }) // ✅ backend expects `question`
+      })
+
+      const data = await res.json()
+      const reply = data.answer || "No response"
+
+      setMessages(m => [...m, { sender: "bot", text: reply, ts: Date.now() }])
+
+      // ✅ update usage stats
+      const s = JSON.parse(localStorage.getItem("student.stats") || "{}")
+      s.usage = (s.usage || 0) + 1
+      if (apiPath === "/api/ask") {
+        s.doubts = (s.doubts || 0) + 1
+      }
+      localStorage.setItem("student.stats", JSON.stringify(s))
+
+    } catch (e) {
+      setMessages(m => [...m, { sender: "bot", text: "Error contacting server", ts: Date.now() }])
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div style={{ paddingTop: "2rem", paddingBottom: "2rem" }}>
@@ -288,7 +296,7 @@ function Chat({ onBack, apiPath, title, updateStats }) {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && send()}
             className="chat-input"
-            placeholder="Type your question or paste your notes..."
+            placeholder="Type your question..."
             disabled={loading}
           />
           <button onClick={send} disabled={loading || !input.trim()} className="btn">
@@ -299,6 +307,7 @@ function Chat({ onBack, apiPath, title, updateStats }) {
     </div>
   )
 }
+
 
 // Practice test component
 function Practice({ onBack, updateStats }) {
