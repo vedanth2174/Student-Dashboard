@@ -223,8 +223,9 @@ function Chat({ onBack, apiPath, title, updateStats }) {
         body: JSON.stringify({ question: text }) // ✅ backend expects `question`
       })
 
-      const data = await res.json()
-      const reply = data.answer || "No response"
+      const data = await res.json();
+      console.log("API response:", data); // 👈 debug line
+      const reply = data.answer || data.error || "No response";
 
       setMessages(m => [...m, { sender: "bot", text: reply, ts: Date.now() }])
 
