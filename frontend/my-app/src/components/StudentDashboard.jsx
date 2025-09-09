@@ -19,23 +19,17 @@ function Logo() {
   )
 }
 
-// Hook to get local stats
-function useLocalStats() {
-  const [stats, setStats] = useState(() => JSON.parse(localStorage.getItem("student.stats") || "{}"))
-  useEffect(() => {
-    const id = setInterval(() => setStats(JSON.parse(localStorage.getItem("student.stats") || "{}")), 800)
-    return () => clearInterval(id)
-  }, [])
-  return stats
-}
-
 // Header component
-function Header({ toggleTheme, theme, onHomeClick }) {
-  const stats = useLocalStats()
+function Header({ toggleTheme, theme, onHomeClick, stats }) {
+  const handleLogout = () => {
+    localStorage.removeItem("token")
+    // You can add additional logout logic here like redirecting to login page
+    window.location.reload() // Optional: reload page after logout
+  }
 
   return (
     <header>
-      <div className="container header-inner">
+      <div className="header-inner">
         <div className="brand" onClick={onHomeClick}>
           <Logo />
           <span className="brand-name">Student Dashboard</span>
@@ -85,6 +79,25 @@ function Header({ toggleTheme, theme, onHomeClick }) {
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor"></path>
             </svg>
           </button>
+
+          <button onClick={handleLogout} className="btn btn-outline" aria-label="Logout">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16,17 21,12 16,7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            <span className="sr-only">Logout</span>
+          </button>
         </div>
       </div>
     </header>
@@ -92,91 +105,85 @@ function Header({ toggleTheme, theme, onHomeClick }) {
 }
 
 // Dashboard component
-function Dashboard({ openNotes, openDoubts, openTest }) {
-  const stats = useLocalStats()
-
+function Dashboard({ openNotes, openDoubts, openTest, stats }) {
   return (
     <main>
       <section className="hero">
-        <div className="container">
-          <div className="hero-grid">
-            <div>
-              <h1 className="title">Welcome to your learning dashboard</h1>
-              <p className="subtitle">
-                Transform your study sessions with AI-powered tools for notes, doubts, and practice tests—all in a
-                clean, focused interface.
-              </p>
-            </div>
+        <div className="hero-grid">
+          <div>
+            <h1 className="title">Welcome to your learning dashboard</h1>
+            <p className="subtitle">
+              Transform your study sessions with AI-powered tools for notes, doubts, and practice tests—all in a clean,
+              focused interface.
+            </p>
           </div>
         </div>
       </section>
 
       <section className="section">
-        <div className="container">
-          <div className="section-header">
-            <h2>Learning Tools</h2>
-            <p className="muted">Everything you need to study effectively</p>
+        <div className="section-header">
+          <h2>Learning Tools</h2>
+          <p className="muted">Everything you need to study effectively</p>
+        </div>
+
+        <div className="grid">
+          <div className="card" onClick={openNotes}>
+            <div className="card-header">
+              <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 6h16v12H4z" fill="var(--primary)" opacity=".15" />
+                <path d="M7 9h10M7 12h7M7 15h6" stroke="var(--primary)" strokeWidth="1.6" strokeLinecap="round" />
+              </svg>
+              <h3 className="card-title">Notes Explainer</h3>
+            </div>
+            <p className="card-desc">
+              Upload or paste your notes and get clear, digestible explanations with AI-powered insights.
+            </p>
           </div>
 
-          <div className="grid">
-            <div className="card" onClick={openNotes}>
-              <div className="card-header">
-                <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M4 6h16v12H4z" fill="var(--primary)" opacity=".15" />
-                  <path d="M7 9h10M7 12h7M7 15h6" stroke="var(--primary)" strokeWidth="1.6" strokeLinecap="round" />
-                </svg>
-                <h3 className="card-title">Notes Explainer</h3>
-              </div>
-              <p className="card-desc">
-                Upload or paste your notes and get clear, digestible explanations with AI-powered insights.
-              </p>
+          <div className="card" onClick={openDoubts}>
+            <div className="card-header">
+              <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" fill="var(--accent)" opacity=".2" />
+                <path d="M12 8v4m0 4h.01" stroke="var(--accent)" strokeWidth="1.6" strokeLinecap="round" />
+              </svg>
+              <h3 className="card-title">Doubt Solver</h3>
             </div>
-
-            <div className="card" onClick={openDoubts}>
-              <div className="card-header">
-                <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-                  <circle cx="12" cy="12" r="9" fill="var(--accent)" opacity=".2" />
-                  <path d="M12 8v4m0 4h.01" stroke="var(--accent)" strokeWidth="1.6" strokeLinecap="round" />
-                </svg>
-                <h3 className="card-title">Doubt Solver</h3>
-              </div>
-              <p className="card-desc">
-                Ask any academic question and get instant, step-by-step solutions to clear your doubts.
-              </p>
-            </div>
-
-            <div className="card" onClick={openTest}>
-              <div className="card-header">
-                <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-                  <rect x="4" y="5" width="16" height="14" rx="2" fill="var(--primary)" opacity=".15" />
-                  <path d="M8 9h8M8 13h6M8 17h4" stroke="var(--primary)" strokeWidth="1.6" strokeLinecap="round" />
-                </svg>
-                <h3 className="card-title">Practice Tests</h3>
-              </div>
-              <p className="card-desc">
-                Generate custom MCQ tests on any topic and track your progress with detailed scoring.
-              </p>
-            </div>
+            <p className="card-desc">
+              Ask any academic question and get instant, step-by-step solutions to clear your doubts.
+            </p>
           </div>
 
-          <div className="section-header" style={{ marginTop: "3rem" }}>
-            <h2>Activity Overview</h2>
-            <p className="muted">Track your learning progress</p>
+          <div className="card" onClick={openTest}>
+            <div className="card-header">
+              <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="4" y="5" width="16" height="14" rx="2" fill="var(--primary)" opacity=".15" />
+                <path d="M8 9h8M8 13h6M8 17h4" stroke="var(--primary)" strokeWidth="1.6" strokeLinecap="round" />
+              </svg>
+              <h3 className="card-title">Practice Tests</h3>
+            </div>
+            <p className="card-desc">
+              Generate custom MCQ tests on any topic and track your progress with detailed scoring.
+            </p>
           </div>
+        </div>
 
-          <div className="activity-grid">
-            <div className="activity-card">
-              <div className="activity-number">{stats.usage || 0}</div>
-              <div className="activity-label">API Calls Made</div>
-            </div>
-            <div className="activity-card">
-              <div className="activity-number">{stats.doubts || 0}</div>
-              <div className="activity-label">Doubts Solved</div>
-            </div>
-            <div className="activity-card">
-              <div className="activity-number">{stats.tests || 0}</div>
-              <div className="activity-label">Tests Taken</div>
-            </div>
+        <div className="section-header" style={{ marginTop: "3rem" }}>
+          <h2>Activity Overview</h2>
+          <p className="muted">Track your learning progress</p>
+        </div>
+
+        <div className="activity-grid">
+          <div className="activity-card">
+            <div className="activity-number">{stats.usage || 0}</div>
+            <div className="activity-label">API Calls Made</div>
+          </div>
+          <div className="activity-card">
+            <div className="activity-number">{stats.doubts || 0}</div>
+            <div className="activity-label">Doubts Solved</div>
+          </div>
+          <div className="activity-card">
+            <div className="activity-number">{stats.tests || 0}</div>
+            <div className="activity-label">Tests Taken</div>
           </div>
         </div>
       </section>
@@ -185,14 +192,13 @@ function Dashboard({ openNotes, openDoubts, openTest }) {
 }
 
 // Chat component
-function Chat({ onBack, apiPath, title }) {
-  const [messages, setMessages] = useState(JSON.parse(localStorage.getItem(apiPath) || "[]"))
+function Chat({ onBack, apiPath, title, updateStats }) {
+  const [messages, setMessages] = useState([])
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
   const messagesRef = useRef(null)
 
   useEffect(() => {
-    localStorage.setItem(apiPath, JSON.stringify(messages))
     if (messagesRef.current) {
       messagesRef.current.scrollTop = messagesRef.current.scrollHeight
     }
@@ -206,22 +212,25 @@ function Chat({ onBack, apiPath, title }) {
     setLoading(true)
 
     try {
-      const res = await fetch(apiPath, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(apiPath.includes("explain") ? { notesText: text } : { question: text }),
-      })
-      const data = await res.json()
-      const reply = data.answer || data.explanation || "No response"
+      // Simulate API call with mock response
+      await new Promise((resolve) => setTimeout(resolve, 1000 + Math.random() * 2000))
+
+      const mockResponses = [
+        "Based on your question, here's a detailed explanation: The concept you're asking about involves several key principles that work together to form a comprehensive understanding.",
+        "Let me break this down step by step: First, we need to understand the fundamental concepts, then we can explore how they apply to your specific question.",
+        "This is an excellent question! The answer involves multiple layers of understanding that build upon each other to create a complete picture.",
+        "I can help clarify this topic for you. The key points to remember are interconnected and form the foundation for deeper learning in this subject.",
+      ]
+
+      const reply = mockResponses[Math.floor(Math.random() * mockResponses.length)]
       setMessages((m) => [...m, { sender: "bot", text: reply, ts: Date.now() }])
 
       // Update stats
-      const s = JSON.parse(localStorage.getItem("student.stats") || "{}")
-      s.usage = (s.usage || 0) + 1
-      if (apiPath === "/api/ask") {
-        s.doubts = (s.doubts || 0) + 1
-      }
-      localStorage.setItem("student.stats", JSON.stringify(s))
+      updateStats((prevStats) => ({
+        ...prevStats,
+        usage: (prevStats.usage || 0) + 1,
+        doubts: apiPath === "/api/ask" ? (prevStats.doubts || 0) + 1 : prevStats.doubts,
+      }))
     } catch (e) {
       setMessages((m) => [...m, { sender: "bot", text: "Error contacting server", ts: Date.now() }])
     } finally {
@@ -230,7 +239,7 @@ function Chat({ onBack, apiPath, title }) {
   }
 
   return (
-    <div className="container" style={{ paddingTop: "2rem", paddingBottom: "2rem" }}>
+    <div style={{ paddingTop: "2rem", paddingBottom: "2rem" }}>
       <div className="back-btn" onClick={onBack}>
         ← Back to Dashboard
       </div>
@@ -295,7 +304,7 @@ function Chat({ onBack, apiPath, title }) {
 }
 
 // Practice test component
-function Practice({ onBack }) {
+function Practice({ onBack, updateStats }) {
   const [subject, setSubject] = useState("Math")
   const [topic, setTopic] = useState("Algebra")
   const [count, setCount] = useState(5)
@@ -307,13 +316,21 @@ function Practice({ onBack }) {
   const generate = async () => {
     setLoading(true)
     try {
-      const res = await fetch("/api/generate-test", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subject, topic, count }),
-      })
-      const data = await res.json()
-      setQuestions(data.questions || [])
+      // Simulate API call with mock questions
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+
+      const mockQuestions = Array.from({ length: Number.parseInt(count) }, (_, i) => ({
+        question: `Question ${i + 1}: What is the result of solving this ${subject.toLowerCase()} problem in ${topic.toLowerCase()}?`,
+        options: [
+          `Option A for question ${i + 1}`,
+          `Option B for question ${i + 1}`,
+          `Option C for question ${i + 1}`,
+          `Option D for question ${i + 1}`,
+        ],
+        answer: Math.floor(Math.random() * 4),
+      }))
+
+      setQuestions(mockQuestions)
       setAnswers({})
       setResult(null)
     } catch (e) {
@@ -329,13 +346,14 @@ function Practice({ onBack }) {
     })
     setResult({ score, total: questions.length })
 
-    const s = JSON.parse(localStorage.getItem("student.stats") || "{}")
-    s.tests = (s.tests || 0) + 1
-    localStorage.setItem("student.stats", JSON.stringify(s))
+    updateStats((prevStats) => ({
+      ...prevStats,
+      tests: (prevStats.tests || 0) + 1,
+    }))
   }
 
   return (
-    <div className="container" style={{ paddingTop: "2rem", paddingBottom: "2rem" }}>
+    <div style={{ paddingTop: "2rem", paddingBottom: "2rem" }}>
       <div className="back-btn" onClick={onBack}>
         ← Back to Dashboard
       </div>
@@ -459,21 +477,13 @@ function Practice({ onBack }) {
 }
 
 // Main App component
-function StudentDashboard() {
+export default function StudentDashboard() {
   const [view, setView] = useState("dashboard")
-  const [theme, setTheme] = useState(() => {
-    try {
-      return localStorage.getItem("theme") || "light"
-    } catch {
-      return "light"
-    }
-  })
+  const [theme, setTheme] = useState("light")
+  const [stats, setStats] = useState({ usage: 0, doubts: 0, tests: 0 })
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme)
-    try {
-      localStorage.setItem("theme", theme)
-    } catch {}
   }, [theme])
 
   const toggleTheme = () => {
@@ -485,9 +495,8 @@ function StudentDashboard() {
   }
 
   return (
-    <>
+    <div style={{ minHeight: "100vh", width: "100%" }}>
       <style>{`
-        /* Color system */
         :root {
           --bg: #ffffff;
           --fg: #0f172a;
@@ -512,13 +521,11 @@ function StudentDashboard() {
           --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
           --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.35);
         }
-
-        /* Typography */
         *, *::before, *::after { box-sizing: border-box; }
         html, body { height: 100%; }
         body {
           margin: 0;
-          font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+          font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
           color: var(--fg);
           background: var(--bg);
           line-height: 1.55;
@@ -531,15 +538,12 @@ function StudentDashboard() {
         .sr-only {
           position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
         }
-
-        /* Layout */
         .container { max-width: 1120px; margin-inline: auto; padding-inline: 1rem; }
         header { position: sticky; top: 0; z-index: 10; backdrop-filter: saturate(150%) blur(8px); background: color-mix(in oklab, var(--bg) 85%, transparent); border-bottom: 1px solid var(--border); }
-        .header-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 1rem; }
+        .header-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 1rem; max-width: 1120px; margin-inline: auto; padding-inline: 1rem; }
         .brand { display: inline-flex; align-items: center; gap: .625rem; cursor: pointer; }
         .brand svg { flex-shrink: 0; }
         .brand-name { font-weight: 700; letter-spacing: -0.01em; }
-
         .actions { display: flex; align-items: center; gap: .75rem; }
         .stats { display: none; align-items: center; gap: .75rem; color: var(--muted); font-size: 0.875rem; }
         @media (min-width: 640px) { .stats { display: flex; } }
@@ -547,8 +551,6 @@ function StudentDashboard() {
         .stat-dot { width: 8px; height: 8px; border-radius: 50%; }
         .stat-dot.usage { background: var(--primary); }
         .stat-dot.doubts { background: var(--accent); }
-
-        /* Buttons */
         .btn {
           --btn-bg: var(--primary);
           --btn-fg: white;
@@ -575,17 +577,13 @@ function StudentDashboard() {
           border-color: color-mix(in oklab, var(--accent) 40%, transparent);
         }
         .btn-small { padding: .5rem .75rem; font-size: 0.875rem; }
-
-        /* Hero/Main content */
+        .content-wrapper { max-width: 1120px; margin-inline: auto; padding-inline: 1rem; }
         .hero { padding-block: 3.5rem; }
         .hero-grid { display: grid; gap: 1.5rem; }
         @media (min-width: 768px) { .hero-grid { grid-template-columns: 1fr; gap: 2rem; } }
         .title { font-size: clamp(1.75rem, 3.5vw, 2.5rem); line-height: 1.2; letter-spacing: -0.02em; margin: .75rem 0; font-weight: 800; }
         .subtitle { color: var(--muted); font-size: 1.05rem; max-width: 56ch; }
-
-        /* Cards */
         .section { padding-block: 2.25rem; }
-        .section-header { margin-bottom: 1.5rem; }
         .section h2 { font-size: clamp(1.25rem, 1.8vw, 1.5rem); letter-spacing: -0.01em; margin-bottom: 0.5rem; }
         .grid { display: grid; gap: 1rem; }
         @media (min-width: 640px) { .grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
@@ -599,8 +597,6 @@ function StudentDashboard() {
         .card-header { display: flex; align-items: center; gap: .625rem; margin-bottom: .75rem; }
         .card-title { font-weight: 700; letter-spacing: -0.01em; font-size: 1.125rem; }
         .card-desc { color: var(--muted); font-size: .975rem; line-height: 1.6; }
-
-        /* Activity cards */
         .activity-grid { display: grid; gap: 1rem; margin-top: 1.5rem; }
         @media (min-width: 640px) { .activity-grid { grid-template-columns: repeat(3, 1fr); } }
         .activity-card { 
@@ -609,8 +605,6 @@ function StudentDashboard() {
         }
         .activity-number { font-size: 2rem; font-weight: 800; color: var(--primary); margin-bottom: 0.25rem; }
         .activity-label { color: var(--muted); font-size: 0.875rem; }
-
-        /* Chat interface */
         .chat-container {
           background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
           display: flex; flex-direction: column; height: 70vh; box-shadow: var(--shadow-md);
@@ -651,8 +645,6 @@ function StudentDashboard() {
           font-size: 0.875rem;
         }
         .chat-input:focus { outline: none; box-shadow: var(--ring); }
-
-        /* Form elements */
         .form-grid { display: grid; gap: 1rem; }
         @media (min-width: 640px) { .form-grid { grid-template-columns: repeat(3, 1fr); } }
         .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
@@ -662,8 +654,6 @@ function StudentDashboard() {
           border-radius: 0.5rem; background: var(--bg); color: var(--fg);
         }
         .form-input:focus { outline: none; box-shadow: var(--ring); }
-
-        /* Test interface */
         .question-card {
           background: var(--card); border: 1px solid var(--border);
           border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem;
@@ -679,8 +669,6 @@ function StudentDashboard() {
         .option-label input[type="radio"] {
           width: 16px; height: 16px; accent-color: var(--primary);
         }
-
-        /* Result display */
         .result-card {
           background: color-mix(in oklab, var(--accent) 10%, var(--card));
           border: 1px solid color-mix(in oklab, var(--accent) 30%, var(--border));
@@ -689,14 +677,10 @@ function StudentDashboard() {
         }
         .result-score { font-size: 3rem; font-weight: 800; color: var(--accent); margin-bottom: 0.5rem; }
         .result-text { color: var(--muted); font-size: 1.125rem; }
-
-        /* Animations */
         @keyframes slideIn {
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }
         }
-
-        /* Loading states */
         .loading-dots {
           display: inline-flex; align-items: center; gap: 0.25rem;
         }
@@ -710,11 +694,7 @@ function StudentDashboard() {
           0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
           40% { transform: scale(1); opacity: 1; }
         }
-
-        /* Focus styles */
         :focus-visible { outline: none; box-shadow: var(--ring); }
-
-        /* Utilities */
         .muted { color: var(--muted); }
         .text-center { text-align: center; }
         .hidden { display: none; }
@@ -726,23 +706,36 @@ function StudentDashboard() {
         .back-btn:hover { color: var(--fg); }
       `}</style>
 
-      <Header toggleTheme={toggleTheme} theme={theme} onHomeClick={goHome} />
+      <Header toggleTheme={toggleTheme} theme={theme} onHomeClick={goHome} stats={stats} />
 
       {view === "dashboard" && (
-        <Dashboard
-          openNotes={() => setView("notes")}
-          openDoubts={() => setView("doubts")}
-          openTest={() => setView("test")}
-        />
+        <div className="content-wrapper">
+          <Dashboard
+            openNotes={() => setView("notes")}
+            openDoubts={() => setView("doubts")}
+            openTest={() => setView("test")}
+            stats={stats}
+          />
+        </div>
       )}
 
-      {view === "notes" && <Chat onBack={goHome} apiPath="/api/explain-notes" title="Notes Explainer" />}
+      {view === "notes" && (
+        <div className="content-wrapper">
+          <Chat onBack={goHome} apiPath="/api/explain-notes" title="Notes Explainer" updateStats={setStats} />
+        </div>
+      )}
 
-      {view === "doubts" && <Chat onBack={goHome} apiPath="/api/ask" title="Doubt Solver" />}
+      {view === "doubts" && (
+        <div className="content-wrapper">
+          <Chat onBack={goHome} apiPath="/api/ask" title="Doubt Solver" updateStats={setStats} />
+        </div>
+      )}
 
-      {view === "test" && <Practice onBack={goHome} />}
-    </>
+      {view === "test" && (
+        <div className="content-wrapper">
+          <Practice onBack={goHome} updateStats={setStats} />
+        </div>
+      )}
+    </div>
   )
 }
-
-export default StudentDashboard;
