@@ -28,7 +28,7 @@ const AuthPage = () => {
   const handleSubmit = async(e) => {
     e.preventDefault();
     if (isSignUp) {
-      const response = await fetch("http://localhost:3000/signup",{
+      const response = await fetch("https://student-dashboard-f21z.onrender.com/signup",{
         method:"POST",
         headers:{
           "Content-Type": "application/json"
@@ -38,7 +38,7 @@ const AuthPage = () => {
       const result = await response.text();
       console.log(result); 
     } else {
-      const response = await fetch("http://localhost:3000/login",{
+      const response = await fetch("https://student-dashboard-f21z.onrender.com/login",{
         method:"POST",
         headers:{
           "Content-Type": "application/json"
