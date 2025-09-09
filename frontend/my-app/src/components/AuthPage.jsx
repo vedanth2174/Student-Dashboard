@@ -6,6 +6,7 @@ import './AuthPage.css';
 const AuthPage = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
@@ -17,6 +18,14 @@ const AuthPage = () => {
     // Apply theme to document root
     document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
+
+  // track viewport width so we only render mobile toggles on <768px
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleInputChange = (e) => {
     setFormData({
@@ -49,18 +58,20 @@ const AuthPage = () => {
       console.log(result);
       if(response.ok){
         localStorage.setItem("token", result.token);
-        console.log("kay mg bhava kasa challa");
         navigate("/dashboard"); // redirect after login
-      }
-      else{
+      } else {
         alert(result);
       }
-
     }
   };
 
-  const toggleMode = () => {
-    setIsSignUp(!isSignUp);
+  // explicit setters so we don't accidentally flip incorrectly
+  const openSignUp = () => {
+    setIsSignUp(true);
+    setFormData({ name: '', email: '', pass: '' });
+  };
+  const openSignIn = () => {
+    setIsSignUp(false);
     setFormData({ name: '', email: '', pass: '' });
   };
 
@@ -81,15 +92,9 @@ const AuthPage = () => {
           <div className="auth-form">
             <h1>Create Account</h1>
             <div className="social-container">
-              <div className="social">
-                <span>f</span>
-              </div>
-              <div className="social">
-                <span>G</span>
-              </div>
-              <div className="social">
-                <span>in</span>
-              </div>
+              <div className="social"><span>f</span></div>
+              <div className="social"><span>G</span></div>
+              <div className="social"><span>in</span></div>
             </div>
             <span className="form-subtitle">or use your email for registration</span>
             <div className="input-group">
@@ -110,7 +115,7 @@ const AuthPage = () => {
                 className="form-input"
               />
               <input
-                type="pass"
+                type="password"
                 name="pass"
                 placeholder="password"
                 value={formData.pass}
@@ -119,6 +124,16 @@ const AuthPage = () => {
               />
             </div>
             <button onClick={handleSubmit} className="auth-button">SIGN UP</button>
+
+            {/* Mobile-only: show Sign In button under Sign Up form */}
+            {isMobile && (
+              <button
+                className="ghost-button mobile-toggle"
+                onClick={openSignIn}
+              >
+                SIGN IN
+              </button>
+            )}
           </div>
         </div>
 
@@ -127,15 +142,9 @@ const AuthPage = () => {
           <div className="auth-form">
             <h1>Welcome Back</h1>
             <div className="social-container">
-              <div className="social">
-                <span>f</span>
-              </div>
-              <div className="social">
-                <span>G</span>
-              </div>
-              <div className="social">
-                <span>in</span>
-              </div>
+              <div className="social"><span>f</span></div>
+              <div className="social"><span>G</span></div>
+              <div className="social"><span>in</span></div>
             </div>
             <span className="form-subtitle">or use your account</span>
             <div className="input-group">
@@ -148,7 +157,7 @@ const AuthPage = () => {
                 className="form-input"
               />
               <input
-                type="pass"
+                type="password"
                 name="pass"
                 placeholder="password"
                 value={formData.pass}
@@ -157,24 +166,34 @@ const AuthPage = () => {
               />
             </div>
             <button onClick={handleSubmit} className="auth-button">SIGN IN</button>
+
+            {/* Mobile-only: show Sign Up button under Sign In form */}
+            {isMobile && (
+              <button
+                className="ghost-button mobile-toggle"
+                onClick={openSignUp}
+              >
+                SIGN UP
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Overlay Container */}
+        {/* Overlay Container (unchanged) */}
         <div className="overlay-container">
           <div className="overlay">
             <div className="overlay-panel overlay-left">
               <div className="overlay-content">
                 <h1>Welcome Back!</h1>
                 <p>To keep connected with us please login with your personal info</p>
-                <button className="ghost-button" onClick={toggleMode}>SIGN IN</button>
+                <button className="ghost-button" onClick={openSignIn}>SIGN IN</button>
               </div>
             </div>
             <div className="overlay-panel overlay-right">
               <div className="overlay-content">
                 <h1>Hello, Friend!</h1>
                 <p>Enter your personal details and start your journey with us</p>
-                <button className="ghost-button" onClick={toggleMode}>SIGN UP</button>
+                <button className="ghost-button" onClick={openSignUp}>SIGN UP</button>
               </div>
             </div>
           </div>

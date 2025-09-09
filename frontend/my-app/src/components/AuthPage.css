@@ -519,3 +519,17 @@ body[data-theme="light"] {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--secondary-gradient);
 }
+
+
+
+/* Mobile-only toggles — doesn't change any desktop styling */
+.mobile-toggle {
+  display: none;
+  margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .mobile-toggle {
+    display: inline-block;
+  }
+}
